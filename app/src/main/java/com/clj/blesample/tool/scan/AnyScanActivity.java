@@ -6,9 +6,11 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -54,7 +57,7 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
 
     private Handler mHandler;
     private boolean mScanning;
-    final private int SCAN_PERIOD = 10000;
+    final private int SCAN_PERIOD = 1000000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +128,65 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        scanLeDevice(true);
+
+        registerReceiver(searchDevices, pairIntentFilter());
+    }
+
+    private void scanLeDevice(final boolean enable) {
+        if (enable) {
+            // Stops scanning after a pre-defined scan period.
+
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    checkPermissions();
+                }
+            }, SCAN_PERIOD);
+
+            mScanning = true;
+            mBluetoothAdapter.startLeScan(mLeScanCallback);
+        } else {
+            mScanning = false;
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+        }
+    }
+
+    public final BroadcastReceiver searchDevices = new BroadcastReceiver() {
+
+        String pin = "1234";  //此处为你要连接的蓝牙设备的初始密钥，一般为1234或0000
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(AnyScanActivity.this, R.string.test, Toast.LENGTH_SHORT).show();
+        }
+
+    };
+
+    private static IntentFilter pairIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+       /* reserved for other usages */
+
+        intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+        intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        intentFilter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
+
+        intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        intentFilter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
+        intentFilter.addAction("com.bluetooth.device.action.FOUND");
+        intentFilter.setPriority(Integer.MAX_VALUE);
+
+        return intentFilter;
+    }
+
     private boolean blueToothInit() {
         // get instance of bluetooth adaptor from os
         final BluetoothManager bluetoothManager =
@@ -141,13 +203,12 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
         mBluetoothAdapter.enable();
 
         // set timer to automatically run the callback function
-        /*mHandler.postDelayed(new Runnable() {
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                onClick(btn_start);
+                checkPermissions();
             }
-        }, SCAN_PERIOD);*/
-        onClick(btn_start);
+        }, SCAN_PERIOD);
 
         return true;
     }
