@@ -45,8 +45,6 @@ import java.util.List;
 
 public class AnyScanActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button btn_start, btn_stop;
-    private ImageView img_loading;
     private Animation operatingAnim;
     private ResultAdapter mResultAdapter;
     private ProgressDialog progressDialog;
@@ -103,11 +101,7 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-        btn_start = (Button) findViewById(R.id.btn_start);
-        btn_start.setOnClickListener(this);
-        btn_stop = (Button) findViewById(R.id.btn_stop);
-        btn_stop.setOnClickListener(this);
-        img_loading = (ImageView) findViewById(R.id.img_loading);
+
         operatingAnim = AnimationUtils.loadAnimation(this, R.anim.rotate);
         operatingAnim.setInterpolator(new LinearInterpolator());
         progressDialog = new ProgressDialog(this);
@@ -215,17 +209,7 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_start:
-                checkPermissions();
-                break;
-
-            case R.id.btn_stop:
-                if (mBluetoothService != null) {
-                    mBluetoothService.cancelScan();
-                }
-                break;
-        }
+        checkPermissions();
     }
 
     private class ResultAdapter extends BaseAdapter {
@@ -323,9 +307,6 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
         public void onStartScan() {
             mResultAdapter.clear();
             mResultAdapter.notifyDataSetChanged();
-            img_loading.startAnimation(operatingAnim);
-            btn_start.setEnabled(false);
-            btn_stop.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -336,9 +317,6 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
 
         @Override
         public void onScanComplete() {
-            img_loading.clearAnimation();
-            btn_start.setEnabled(true);
-            btn_stop.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -348,9 +326,6 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
 
         @Override
         public void onConnectFail() {
-            img_loading.clearAnimation();
-            btn_start.setEnabled(true);
-            btn_stop.setVisibility(View.INVISIBLE);
             progressDialog.dismiss();
             Toast.makeText(AnyScanActivity.this, "连接失败", Toast.LENGTH_LONG).show();
         }
@@ -360,9 +335,6 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
             progressDialog.dismiss();
             mResultAdapter.clear();
             mResultAdapter.notifyDataSetChanged();
-            img_loading.clearAnimation();
-            btn_start.setEnabled(true);
-            btn_stop.setVisibility(View.INVISIBLE);
             Toast.makeText(AnyScanActivity.this, "连接断开", Toast.LENGTH_LONG).show();
         }
 
