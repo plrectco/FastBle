@@ -3,13 +3,16 @@ package com.clj.blesample.tool.scan;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -47,13 +50,36 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
 
     private BluetoothService mBluetoothService;
 
+    private BluetoothAdapter mBluetoothAdapter;
+
+    private Handler mHandler;
+    private boolean mScanning;
+    final private int SCAN_PERIOD = 10000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_any_scan);
         initView();
+
+        mHandler = new Handler();
+
+        if(!blueToothInit())
+            finish();
+
+
     }
+
+    private BluetoothAdapter.LeScanCallback mLeScanCallback =
+            new BluetoothAdapter.LeScanCallback() {
+                @Override
+                public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+
+                    checkPermissions();
+
+                }
+            };
 
     @Override
     protected void onDestroy() {
@@ -97,6 +123,33 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         });
+    }
+
+    private boolean blueToothInit() {
+        // get instance of bluetooth adaptor from os
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+
+        // if the ble is not supported, return to indicate failure
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // enable BLE
+        mBluetoothAdapter.enable();
+
+        // set timer to automatically run the callback function
+        /*mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                onClick(btn_start);
+            }
+        }, SCAN_PERIOD);*/
+        onClick(btn_start);
+
+        return true;
     }
 
     @Override
