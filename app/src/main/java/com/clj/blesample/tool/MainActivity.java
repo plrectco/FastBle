@@ -47,13 +47,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        findViewById(R.id.txt_user).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, UserActivity.class));
-            }
-        });
-
         ListView mListView = (ListView) findViewById(R.id.list);
         mListView.setAdapter(new ConnectModeAdapter(this, modes));
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
