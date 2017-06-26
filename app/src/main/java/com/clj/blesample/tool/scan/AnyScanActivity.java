@@ -55,30 +55,51 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
 
     private Handler mHandler;
     private boolean mScanning;
-    final private int SCAN_PERIOD = 1000000;
+    final private int SCAN_PERIOD = 100000000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_any_scan);
-        initView();
 
         mHandler = new Handler();
 
         if(!blueToothInit())
             finish();
 
+        setContentView(R.layout.activity_any_scan);
 
+        initView();
+
+    }
+
+    private boolean blueToothInit() {
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // get instance of bluetooth adaptor from os
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+
+        // if the ble is not supported, return to indicate failure
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // enable BLE
+        mBluetoothAdapter.enable();
+
+        return true;
     }
 
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-
                     checkPermissions();
-
                 }
             };
 
@@ -125,22 +146,28 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onResume() {
         super.onResume();
-
+        mResultAdapter = new ResultAdapter(this);
+        ListView listView_device = (ListView) findViewById(R.id.list_device);
+        listView_device.setAdapter(mResultAdapter);
         scanLeDevice(true);
-
         registerReceiver(searchDevices, pairIntentFilter());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        scanLeDevice(false);
+        mResultAdapter.clear();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             // Stops scanning after a pre-defined scan period.
-
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    checkPermissions();
-                }
-            }, SCAN_PERIOD);
 
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
@@ -164,13 +191,13 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
     private static IntentFilter pairIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
        /* reserved for other usages */
-
+/*
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
         intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         intentFilter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
-
+*/
         intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -181,31 +208,7 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
         return intentFilter;
     }
 
-    private boolean blueToothInit() {
-        // get instance of bluetooth adaptor from os
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
 
-        // if the ble is not supported, return to indicate failure
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        // enable BLE
-        mBluetoothAdapter.enable();
-
-        // set timer to automatically run the callback function
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                checkPermissions();
-            }
-        }, SCAN_PERIOD);
-
-        return true;
-    }
 
     @Override
     public void onClick(View v) {
@@ -224,6 +227,10 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
 
         void addResult(ScanResult result) {
             scanResultList.add(result);
+        }
+
+        void newList() {
+            scanResultList = new ArrayList<>();
         }
 
         void clear() {
