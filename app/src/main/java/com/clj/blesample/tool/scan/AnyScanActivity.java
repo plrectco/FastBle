@@ -70,6 +70,9 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
 
         initView();
 
+        String[] deniedPermissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+        ActivityCompat.requestPermissions(this, deniedPermissions, 12);
+
     }
 
     private boolean blueToothInit() {
