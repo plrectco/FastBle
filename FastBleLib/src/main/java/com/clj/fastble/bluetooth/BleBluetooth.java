@@ -296,7 +296,8 @@ public class BleBluetooth {
     }
 
     public void enableBluetooth() {
-        bluetoothAdapter.enable();
+        if(!this.isBlueEnable())
+            bluetoothAdapter.enable();
     }
 
     public void disableBluetooth() {
