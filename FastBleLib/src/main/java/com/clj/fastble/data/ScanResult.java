@@ -87,4 +87,6 @@ public class ScanResult implements Parcelable {
         this.mTimestampNanos = timestampNanos;
     }
 
+    public boolean scanResultEqual(ScanResult s) { return this.mDevice.equals(s.mDevice); }
+
 }

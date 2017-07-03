@@ -232,6 +232,31 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
             scanResultList.add(result);
         }
 
+        public boolean hasResult(ScanResult result) {
+            int it = 0;
+            for(; it < scanResultList.size(); ++it) {
+                if(getItem(it).scanResultEqual(result))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void updateResult(ScanResult result) {
+            int it = 0;
+            for(; it < scanResultList.size(); ++it) {
+                if(getItem(it).scanResultEqual(result)) {
+                    updateSingleResult(getItem(it), result);
+                }
+            }
+
+            // NOTE: should assert here
+        }
+
+        private void updateSingleResult(ScanResult oldResult, ScanResult newResult) {
+            oldResult.setRssi(newResult.getRssi());
+        }
+
         void newList() {
             scanResultList = new ArrayList<>();
         }
@@ -315,13 +340,19 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
     private BluetoothService.Callback callback = new BluetoothService.Callback() {
         @Override
         public void onStartScan() {
-            mResultAdapter.clear();
+            // NOTE: don't clear the result every time we scan the device
+            // mResultAdapter.clear();
             mResultAdapter.notifyDataSetChanged();
         }
 
         @Override
         public void onScanning(ScanResult result) {
-            mResultAdapter.addResult(result);
+            // NOTE: we only update the change of RSSI
+            if(!mResultAdapter.hasResult(result))
+                mResultAdapter.addResult(result);
+            else
+                mResultAdapter.updateResult(result);
+
             mResultAdapter.notifyDataSetChanged();
         }
 
