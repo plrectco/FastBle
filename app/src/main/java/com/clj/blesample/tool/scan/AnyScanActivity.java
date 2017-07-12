@@ -45,9 +45,6 @@ import java.util.TimerTask;
 import android.os.Handler;
 import android.os.Message;
 
-import static com.clj.blesample.R.id.btn_start;
-import static com.clj.blesample.R.id.btn_stop;
-
 
 public class AnyScanActivity extends AppCompatActivity implements View.OnClickListener {
 
