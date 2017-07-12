@@ -27,8 +27,9 @@ public abstract class ListScanCallback extends PeriodScanCallback {
 
         ScanResult scanResult = new ScanResult(device, rssi, scanRecord,
                 System.currentTimeMillis());
+        onScanning(scanResult);
 
-        synchronized (this) {
+        /*synchronized (this) {
             hasFound.set(false);
             for (ScanResult result : resultList) {
                 if (result.getDevice().equals(device)) {
@@ -39,7 +40,7 @@ public abstract class ListScanCallback extends PeriodScanCallback {
                 resultList.add(scanResult);
                 onScanning(scanResult);
             }
-        }
+        }*/
     }
 
     @Override

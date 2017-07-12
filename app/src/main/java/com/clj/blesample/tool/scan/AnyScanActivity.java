@@ -132,7 +132,7 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
             public void run() {
                 checkPermissions();
             }
-        }, 10, 50/* 表示1000毫秒之後，每隔1000毫秒執行一次 */);
+        }, 10, 100000005/* 表示1000毫秒之後，每隔1000毫秒執行一次 */);
     }
 
     @Override

@@ -102,7 +102,7 @@ public class BluetoothService extends Service {
             mCallback.onStartScan();
         }
 
-        boolean b = bleManager.scanDevice(new ListScanCallback(40) {
+        boolean b = bleManager.scanDevice(new ListScanCallback(10000000) {
 
             @Override
             public void onScanning(final ScanResult result) {
