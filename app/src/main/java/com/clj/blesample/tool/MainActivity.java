@@ -28,12 +28,7 @@ import com.clj.blesample.tool.scan.NamesScanActivity;
 public class MainActivity extends AppCompatActivity {
 
     private String[] modes = new String[]{
-            "扫描所有设备，并显示",
-            "扫描指定广播名的设备，并连接（唯一广播名）",
-            "扫描指定广播名的设备，并连接（模糊广播名）",
-            "扫描指定广播名的设备，并连接（多个广播名）",
-            "扫描指定广播名的设备，并连接（模糊、多个广播名）",
-            "扫描指定物理地址的设备，并连接"};
+            "Start PEPS scanning",};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        startActivity(new Intent(MainActivity.this, AnyScanActivity.class));
+
         ListView mListView = (ListView) findViewById(R.id.list);
         mListView.setAdapter(new ConnectModeAdapter(this, modes));
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -55,26 +52,6 @@ public class MainActivity extends AppCompatActivity {
                 switch (position) {
                     case 0:
                         startActivity(new Intent(MainActivity.this, AnyScanActivity.class));
-                        break;
-
-                    case 1:
-                        startActivity(new Intent(MainActivity.this, NameScanActivity.class));
-                        break;
-
-                    case 2:
-                        startActivity(new Intent(MainActivity.this, NameFuzzyScanActivity.class));
-                        break;
-
-                    case 3:
-                        startActivity(new Intent(MainActivity.this, NamesScanActivity.class));
-                        break;
-
-                    case 4:
-                        startActivity(new Intent(MainActivity.this, NamesFuzzyScanActivity.class));
-                        break;
-
-                    case 5:
-                        startActivity(new Intent(MainActivity.this, MacScanActivity.class));
                         break;
                 }
             }

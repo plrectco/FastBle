@@ -75,6 +75,13 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
             unbindService();
     }
 
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
     protected TimerTask task = new TimerTask() {
         public void run() {
             checkPermissions();
