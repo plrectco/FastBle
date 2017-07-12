@@ -174,6 +174,10 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
             // NOTE: should assert here
         }
 
+        private void updateSingleResult(ScanResult oldResult, ScanResult newResult) {
+            oldResult.setRssi(newResult.getRssi());
+        }
+
         @Override
         public int getCount() {
             return scanResultList.size();
