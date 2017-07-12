@@ -17,6 +17,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -120,6 +121,8 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
+
+
         setTimerTask();
     }
 
@@ -129,7 +132,7 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
             public void run() {
                 checkPermissions();
             }
-        }, 1000, 2000/* 表示1000毫秒之後，每隔1000毫秒執行一次 */);
+        }, 10, 50/* 表示1000毫秒之後，每隔1000毫秒執行一次 */);
     }
 
     @Override
@@ -253,7 +256,7 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
     private BluetoothService.Callback callback = new BluetoothService.Callback() {
         @Override
         public void onStartScan() {
-            mResultAdapter.clear();
+            // mResultAdapter.clear();
 
             Message msg = new Message();
             msg.what = mCOMPLETE;
@@ -262,7 +265,14 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
 
         @Override
         public void onScanning(ScanResult result) {
-            mResultAdapter.addResult(result);
+            // NOTE: we only update the change of RSSI
+
+            // Log.e("PEPS", "onScanning" + Integer.toString(result.getRssi()) + " " + result.getName());
+            if(!mResultAdapter.hasResult(result))
+                mResultAdapter.addResult(result);
+            else
+                mResultAdapter.updateResult(result);
+
             mResultAdapter.notifyDataSetChanged();
         }
 

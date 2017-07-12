@@ -91,4 +91,6 @@ public class ScanResult implements Parcelable {
 
     public boolean scanResultEqual(ScanResult s) { return this.mDevice.equals(s.mDevice); }
 
+    public String getName() { return this.mDevice.getName(); }
+
 }
