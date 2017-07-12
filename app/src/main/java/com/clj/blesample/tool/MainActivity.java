@@ -13,13 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.clj.blesample.R;
-import com.clj.blesample.tool.other.UserActivity;
 import com.clj.blesample.tool.scan.AnyScanActivity;
-import com.clj.blesample.tool.scan.MacScanActivity;
-import com.clj.blesample.tool.scan.NameFuzzyScanActivity;
-import com.clj.blesample.tool.scan.NameScanActivity;
-import com.clj.blesample.tool.scan.NamesFuzzyScanActivity;
-import com.clj.blesample.tool.scan.NamesScanActivity;
 
 
 /**

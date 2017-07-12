@@ -27,11 +27,6 @@
 
         <activity android:name=".tool.other.UserActivity"/>
         <activity android:name=".tool.scan.AnyScanActivity" />
-        <activity android:name=".tool.scan.NameScanActivity" />
-        <activity android:name=".tool.scan.NameFuzzyScanActivity" />
-        <activity android:name=".tool.scan.NamesScanActivity" />
-        <activity android:name=".tool.scan.NamesFuzzyScanActivity" />
-        <activity android:name=".tool.scan.MacScanActivity" />
         <activity android:name=".tool.operation.OperationActivity" />
 
         <service android:name=".tool.BluetoothService" />
