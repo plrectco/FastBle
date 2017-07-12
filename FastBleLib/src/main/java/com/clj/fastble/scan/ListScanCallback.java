@@ -25,8 +25,12 @@ public abstract class ListScanCallback extends PeriodScanCallback {
         if (device == null)
             return;
 
+        if(device.getName() == null)
+            return;
+
         ScanResult scanResult = new ScanResult(device, rssi, scanRecord,
                 System.currentTimeMillis());
+
         onScanning(scanResult);
 
         /*synchronized (this) {
