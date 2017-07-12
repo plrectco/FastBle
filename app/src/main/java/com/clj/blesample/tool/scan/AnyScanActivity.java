@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -36,6 +37,15 @@ import com.clj.fastble.data.ScanResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+
+import android.os.Handler;
+import android.os.Message;
+
+import static android.R.attr.delay;
+import static android.net.wifi.SupplicantState.COMPLETED;
 
 public class AnyScanActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -46,6 +56,9 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
     private ProgressDialog progressDialog;
 
     private BluetoothService mBluetoothService;
+    private Timer mTimer = new Timer(true);
+
+    final int mCOMPLETE = 12;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +74,24 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
         if (mBluetoothService != null)
             unbindService();
     }
+
+    protected TimerTask task = new TimerTask() {
+        public void run() {
+            checkPermissions();
+        }
+    };
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == mCOMPLETE) {
+                mResultAdapter.notifyDataSetChanged();
+                img_loading.startAnimation(operatingAnim);
+                btn_start.setEnabled(false);
+                btn_stop.setVisibility(View.VISIBLE);
+            }
+        }
+    };
 
     private void initView() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -97,6 +128,17 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         });
+
+        setTimerTask();
+    }
+
+    private void setTimerTask() {
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                checkPermissions();
+            }
+        }, 1000, 2000/* 表示1000毫秒之後，每隔1000毫秒執行一次 */);
     }
 
     @Override
@@ -208,10 +250,10 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
         @Override
         public void onStartScan() {
             mResultAdapter.clear();
-            mResultAdapter.notifyDataSetChanged();
-            img_loading.startAnimation(operatingAnim);
-            btn_start.setEnabled(false);
-            btn_stop.setVisibility(View.VISIBLE);
+
+            Message msg = new Message();
+            msg.what = mCOMPLETE;
+            mHandler.sendMessage(msg);
         }
 
         @Override
