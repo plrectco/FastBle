@@ -153,6 +153,27 @@ public class AnyScanActivity extends AppCompatActivity implements View.OnClickLi
             scanResultList.clear();
         }
 
+        public boolean hasResult(ScanResult result) {
+            int it = 0;
+            for(; it < scanResultList.size(); ++it) {
+                if(getItem(it).scanResultEqual(result))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void updateResult(ScanResult result) {
+            int it = 0;
+            for(; it < scanResultList.size(); ++it) {
+                if(getItem(it).scanResultEqual(result)) {
+                    updateSingleResult(getItem(it), result);
+                }
+            }
+
+            // NOTE: should assert here
+        }
+
         @Override
         public int getCount() {
             return scanResultList.size();
