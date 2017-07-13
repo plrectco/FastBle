@@ -6,19 +6,30 @@ import android.bluetooth.le.ScanRecord;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.LinkedList;
+
 
 public class ScanResult implements Parcelable {
 
     private BluetoothDevice mDevice;
     private byte[] mScanRecord;
     private int mRssi;
+    protected LinkedList<Integer> mRssiList;
+    protected LinkedList<Integer> mRssiPredList;
     private long mTimestampNanos;
+    final private int sizeLimit = 30;
+    final private int leastRssiNum = 3;
+    protected double estimateStateCov = 1.0;
+
 
     public ScanResult(BluetoothDevice device, int rssi,byte[] scanRecord,
                       long timestampNanos) {
+        mRssiList = new LinkedList();
+        mRssiPredList = new LinkedList();
         mDevice = device;
         mScanRecord = scanRecord;
         mRssi = rssi;
+        mRssiList.addFirst(mRssi);
         mTimestampNanos = timestampNanos;
     }
 
@@ -75,8 +86,27 @@ public class ScanResult implements Parcelable {
         return mRssi;
     }
 
+    protected int updateRssiList(int rssi) {
+        mRssiList.addFirst(rssi);
+        if(mRssiList.size()>sizeLimit) {
+            mRssiList.removeLast();
+        }
+
+        if(mRssiList.size() > leastRssiNum) {
+            rssi = Filter.GassianFilter(this);
+        }
+
+        mRssiPredList.addFirst(rssi);
+        if(mRssiPredList.size()>sizeLimit) {
+            mRssiPredList.removeLast();
+        }
+
+        return rssi;
+    }
+
     public void setRssi(int rssi) {
-        this.mRssi = rssi;
+        int filterRssi = updateRssiList(rssi);
+        this.mRssi = filterRssi;
     }
 
     public long getTimestampNanos() {
